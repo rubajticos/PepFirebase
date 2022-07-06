@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -56,6 +57,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-core:$composeVersion")
     implementation("androidx.compose.material:material-icons-extended:$composeVersion")
     implementation("androidx.compose.runtime:runtime-livedata:$composeVersion")
+    implementation 'com.google.firebase:firebase-database-ktx:20.0.4'
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:$composeVersion")
 
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.0'

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "636497378549",
+    "firebase_url": "https://sheet-firebase-android-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "sheet-firebase-android",
+    "storage_bucket": "sheet-firebase-android.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:636497378549:android:bdbd4a62cbbf1010da99bc",
+        "android_client_info": {
+          "package_name": "pl.rubajticos.pepfirebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "636497378549-vg3bd394crth7i4dpgl5buj3nrrgnnoi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDKB21Yjn94skflC5BHj5eZdSRgc5cO0Gg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "636497378549-vg3bd394crth7i4dpgl5buj3nrrgnnoi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
