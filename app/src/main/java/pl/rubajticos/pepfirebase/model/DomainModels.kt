@@ -13,12 +13,13 @@ data class Book(
     val id: String,
     val title: String,
     val author: String,
-    val year: String,
+    val year: Long,
     val borrowStatus: BorrowStatus
 )
 
 data class BorrowStatus(
     val isBorrowed: Boolean,
     val borrowedBy: Person?,
+    val borrowedById: String?,
     val borrowedTo: Date?
 )

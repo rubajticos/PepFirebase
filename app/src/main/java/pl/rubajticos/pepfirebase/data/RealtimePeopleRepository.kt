@@ -12,6 +12,9 @@ import pl.rubajticos.pepfirebase.model.Person
 import pl.rubajticos.pepfirebase.model.PersonEntity
 import pl.rubajticos.pepfirebase.model.toPerson
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class RealtimePeopleRepository @Inject constructor(
     private val database: FirebaseDatabase
@@ -45,8 +48,26 @@ class RealtimePeopleRepository @Inject constructor(
         }
     }
 
-    override suspend fun findById(id: String): Result<Person> {
-        TODO("Not yet implemented")
+    override suspend fun findById(id: String): Result<Person> = suspendCoroutine { continuation ->
+        database.getReference("$PEOPLE_REFERENCE/$id").addListenerForSingleValueEvent(
+            object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        snapshot.getValue(PersonEntity::class.java)?.toPerson()?.let { person ->
+                            continuation.resume(Result.success(person))
+                        } ?: run {
+                            continuation.resumeWithException(IllegalStateException("Person with $id not found"))
+                        }
+                    } else {
+                        continuation.resumeWithException(IllegalStateException("Person with $id not found"))
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    continuation.resumeWithException(error.toException())
+                }
+            }
+        )
     }
 
     companion object {

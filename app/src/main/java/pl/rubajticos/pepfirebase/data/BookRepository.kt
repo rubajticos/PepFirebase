@@ -5,6 +5,6 @@ import pl.rubajticos.pepfirebase.model.Book
 
 interface BookRepository {
 
-    suspend fun allBooks(): Flow<List<Book>>
+    suspend fun allBooks(): Flow<Result<List<Book>>>
 
 }

@@ -7,15 +7,15 @@ data class PersonEntity(
 )
 
 data class BookEntity(
-    val id: String,
-    val title: String,
-    val author: String,
-    val year: String,
-    val status: Status
+    var id: String = "",
+    var title: String = "",
+    var author: String = "",
+    var year: Long = -1L,
+    var status: Status = Status(false, null, null)
 )
 
 data class Status(
-    val isBorrowed: Boolean,
-    val borrowedBy: String?,
-    val borrowedTo: String?
+    var isBorrowed: Boolean = false,
+    var borrowedBy: String? = null,
+    var borrowedTo: String? = null
 )
