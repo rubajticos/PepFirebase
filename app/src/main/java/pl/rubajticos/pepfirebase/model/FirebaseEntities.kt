@@ -1,9 +1,9 @@
 package pl.rubajticos.pepfirebase.model
 
 data class PersonEntity(
-    val id: String,
-    val firstName: String,
-    val lastName: String
+    var id: String = "",
+    var firstName: String = "",
+    var lastName: String = ""
 )
 
 data class BookEntity(
