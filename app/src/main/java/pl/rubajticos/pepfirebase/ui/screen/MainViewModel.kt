@@ -1,4 +1,4 @@
-package pl.rubajticos.pepfirebase
+package pl.rubajticos.pepfirebase.ui.screen
 
 import android.util.Log
 import androidx.compose.runtime.getValue

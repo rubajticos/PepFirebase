@@ -1,4 +1,4 @@
-package pl.rubajticos.pepfirebase
+package pl.rubajticos.pepfirebase.ui.screen
 
 import pl.rubajticos.pepfirebase.model.Book
 

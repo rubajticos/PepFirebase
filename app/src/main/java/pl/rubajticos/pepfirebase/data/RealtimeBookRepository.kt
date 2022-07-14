@@ -1,5 +1,6 @@
 package pl.rubajticos.pepfirebase.data
 
+import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -43,8 +44,36 @@ class RealtimeBookRepository @Inject constructor(
         }
     }
 
+    override suspend fun findBookById(id: String): Flow<Result<Book>> = callbackFlow {
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    Log.d("MRMR", "Daya exists")
+                    snapshot.getValue(BookEntity::class.java)?.toBook()?.let {
+                        this@callbackFlow.trySendBlocking(Result.success(it))
+                    } ?: run {
+                        this@callbackFlow.trySendBlocking(Result.failure(Exception("Person with ID=$id not found")))
+                    }
+                } else {
+                    this@callbackFlow.trySendBlocking(Result.failure(Exception("Person with ID=$id not found")))
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                this@callbackFlow.trySendBlocking(Result.failure(error.toException()))
+            }
+        }
+        database.getReference(BOOK_REFERENCE + id)
+            .addValueEventListener(listener)
+
+        awaitClose {
+            database.getReference(BOOK_REFERENCE + id).removeEventListener(listener)
+        }
+    }
+
     companion object {
         private const val MAIN_REFERENCE = "1BTAE3GTAtnKEporJLcBK7WquSX33bW1EvI1pm3Z9wMw"
         private const val BOOKS_REFERENCE = "$MAIN_REFERENCE/Books"
+        private const val BOOK_REFERENCE = "$MAIN_REFERENCE/Books/"
     }
 }

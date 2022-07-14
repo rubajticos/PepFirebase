@@ -7,4 +7,6 @@ interface BookRepository {
 
     suspend fun allBooks(): Flow<Result<List<Book>>>
 
+    suspend fun findBookById(id: String): Flow<Result<Book>>
+
 }

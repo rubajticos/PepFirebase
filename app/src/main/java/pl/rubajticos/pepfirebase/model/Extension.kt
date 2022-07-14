@@ -30,3 +30,8 @@ fun String.toDate(): Date? {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
     return dateFormat.parse(this)
 }
+
+fun Date.toDateString(): String {
+    val dateFormat = SimpleDateFormat("dd.MM.yyyy 'r.'", Locale.getDefault())
+    return dateFormat.format(this)
+}
