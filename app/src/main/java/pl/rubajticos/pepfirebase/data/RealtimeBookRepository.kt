@@ -1,6 +1,5 @@
 package pl.rubajticos.pepfirebase.data
 
-import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -48,7 +47,6 @@ class RealtimeBookRepository @Inject constructor(
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
-                    Log.d("MRMR", "Daya exists")
                     snapshot.getValue(BookEntity::class.java)?.toBook()?.let {
                         this@callbackFlow.trySendBlocking(Result.success(it))
                     } ?: run {
