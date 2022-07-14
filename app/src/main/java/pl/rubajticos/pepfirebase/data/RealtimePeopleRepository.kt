@@ -19,8 +19,6 @@ import kotlin.coroutines.suspendCoroutine
 class RealtimePeopleRepository @Inject constructor(
     private val database: FirebaseDatabase
 ) : PeopleRepository {
-
-
     override suspend fun allPeople(): Flow<Result<List<Person>>> = callbackFlow {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {

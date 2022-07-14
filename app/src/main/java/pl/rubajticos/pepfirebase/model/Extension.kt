@@ -4,19 +4,19 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 fun PersonEntity.toPerson(): Person = Person(
-    id = this.id,
-    firstName = this.firstName,
-    lastName = this.lastName,
+    id = this.id ?: "",
+    firstName = this.firstName ?: "",
+    lastName = this.lastName ?: "",
     books = emptyList()
 )
 
 fun BookEntity.toBook(): Book = Book(
-    id = this.id,
-    title = this.title,
-    author = this.author,
-    year = this.year,
+    id = this.id ?: "",
+    title = this.title ?: "",
+    author = this.author ?: "",
+    year = this.year?.toLongOrNull() ?: -1L,
     borrowStatus = BorrowStatus(
-        isBorrowed = this.status.isBorrowed,
+        isBorrowed = this.status.isBorrowed?.lowercase()?.toBooleanStrictOrNull() ?: false,
         borrowedBy = null,
         borrowedById = this.status.borrowedBy,
         borrowedTo = this.status.borrowedTo?.toDate()
