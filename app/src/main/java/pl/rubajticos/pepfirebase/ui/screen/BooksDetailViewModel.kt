@@ -37,16 +37,19 @@ class BooksDetailViewModel @Inject constructor(
             bookRepository.findBookById(id)
                 .collect {
                     it.onSuccess { book ->
+                        val shouldResetBorrowFullName =
+                            state.borrowedBy != book.borrowStatus.borrowedById
                         state = state.copy(
                             title = book.title,
                             author = book.author,
                             year = book.year,
                             isBorrowed = book.borrowStatus.isBorrowed,
                             borrowedBy = book.borrowStatus.borrowedById,
-                            borrowedTo = book.borrowStatus.borrowedTo?.toDateString()
+                            borrowedTo = book.borrowStatus.borrowedTo?.toDateString(),
+                            borrowedByFullName = if (shouldResetBorrowFullName) null else state.borrowedByFullName
                         )
 
-                        if (book.borrowStatus.isBorrowed && state.borrowedByFullName == null) {
+                        if (book.borrowStatus.isBorrowed && book.borrowStatus.borrowedById != null) {
                             fillFullBorrowedPersonData(book.borrowStatus.borrowedById)
                         }
                     }
