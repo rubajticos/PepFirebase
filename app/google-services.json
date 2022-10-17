@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "636497378549-sebtodcep940o0g721utavng56464lin.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "pl.rubajticos.pepfirebase",
+            "certificate_hash": "035f1fc4e40c9ba7e53a70594f8f758797ee4580"
+          }
+        },
+        {
           "client_id": "636497378549-vg3bd394crth7i4dpgl5buj3nrrgnnoi.apps.googleusercontent.com",
           "client_type": 3
         }
