@@ -1,16 +1,17 @@
 package pl.rubajticos.pepfirebase.ui.screen
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import pl.rubajticos.pepfirebase.data.PeopleRepository
 import pl.rubajticos.pepfirebase.data.RealtimeBookRepository
-import javax.inject.Inject
+import timber.log.Timber
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -21,20 +22,25 @@ class MainViewModel @Inject constructor(
     var state by mutableStateOf(BooksState())
 
     init {
-        Log.d("MRMR", "VM init")
         viewModelScope.launch {
             peopleRepository.allPeople()
                 .collect {
-                    it.onSuccess { people -> Log.d("MRMR", people.joinToString("; ")) }
+                    it.onSuccess { people -> Timber.d("MRMR ${people.joinToString(";")}") }
                         .onFailure { fail ->
-                            Log.d(
-                                "MRMR",
-                                fail.localizedMessage ?: "Unknown error"
-                            )
+                            Timber.d(" MRMR ${fail.localizedMessage ?: "Unknown error"}")
                         }
                 }
         }
         observeBooks()
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Timber.d("MRMR Retrieve token failed because: ${task.exception?.localizedMessage ?: ""}")
+                return@addOnCompleteListener
+            }
+
+            val token = task.result
+            Timber.d("MRMR FCM token $token")
+        }
     }
 
     private fun observeBooks() = viewModelScope.launch {
