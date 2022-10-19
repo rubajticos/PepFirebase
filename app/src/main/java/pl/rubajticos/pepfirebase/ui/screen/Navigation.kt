@@ -6,6 +6,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
+
+const val PROJECT_URI = "https://pepexample.pl"
+const val BOOK_DETAILS_URI = "$PROJECT_URI/bookId="
 
 @Composable
 fun Navigation() {
@@ -22,7 +26,8 @@ fun Navigation() {
                     defaultValue = null
                     nullable = true
                 }
-            )
+            ),
+            deepLinks = listOf(navDeepLink { uriPattern = "$BOOK_DETAILS_URI{bookId}" })
         ) { entry ->
             BookDetailScreen(bookId = entry.arguments?.getString("bookId"))
         }
