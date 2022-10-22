@@ -56,6 +56,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             .setContentTitle(notificationTitle)
             .setContentText(notificationText)
             .setContentIntent(openBookIntent)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(notificationText))
             .setPriority(NotificationCompat.PRIORITY_MAX)
 
         val notificationManager =
