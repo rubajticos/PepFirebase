@@ -61,6 +61,7 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:$composeVersion")
     implementation 'com.google.firebase:firebase-database-ktx:20.0.4'
     implementation 'com.google.firebase:firebase-messaging-ktx:23.0.2'
+    implementation 'com.google.firebase:firebase-auth-ktx:21.1.0'
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:$composeVersion")
 
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.0'

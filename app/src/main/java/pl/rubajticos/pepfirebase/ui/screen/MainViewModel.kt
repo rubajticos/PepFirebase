@@ -8,12 +8,17 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.io.File
 import java.lang.Byte
 import javax.inject.Inject
+import kotlin.Any
+import kotlin.String
+import kotlin.TODO
+import kotlin.onFailure
+import kotlin.onSuccess
+import kotlin.runCatching
+import kotlin.to
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import pl.rubajticos.pepfirebase.data.PeopleRepository
 import pl.rubajticos.pepfirebase.data.RealtimeBookRepository
 import timber.log.Timber
@@ -81,6 +86,10 @@ class MainViewModel @Inject constructor(
                     state = state.copy(books = newBooks)
                 }
             }
+    }
+
+    fun authWithMicrosoft() {
+        TODO("Not yet implemented")
     }
 
 }

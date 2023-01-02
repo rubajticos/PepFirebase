@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,7 +24,17 @@ import pl.rubajticos.pepfirebase.model.Book
 @Composable
 fun MainScreen(navController: NavController, viewModel: MainViewModel = hiltViewModel()) {
     val state = viewModel.state
-    BooksList(state.books, navController)
+    Column(modifier = Modifier
+        .fillMaxHeight()
+        .fillMaxWidth()) {
+        Button(onClick = {
+            viewModel.authWithMicrosoft()
+        }) {
+            Text(text = "Sign In with Microsoft")
+        }
+        BooksList(state.books, navController)
+    }
+
 }
 
 @Composable
