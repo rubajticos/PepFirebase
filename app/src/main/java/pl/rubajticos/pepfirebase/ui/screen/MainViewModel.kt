@@ -18,7 +18,9 @@ import kotlin.onSuccess
 import kotlin.runCatching
 import kotlin.to
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import pl.rubajticos.pepfirebase.auth.MicrosoftAuthentication
 import pl.rubajticos.pepfirebase.data.PeopleRepository
 import pl.rubajticos.pepfirebase.data.RealtimeBookRepository
 import timber.log.Timber
@@ -27,7 +29,8 @@ import timber.log.Timber
 class MainViewModel @Inject constructor(
     private val peopleRepository: PeopleRepository,
     private val booksRepository: RealtimeBookRepository,
-    private val database: FirebaseDatabase
+    private val database: FirebaseDatabase,
+    private val auth: MicrosoftAuthentication
 ) : ViewModel() {
 
     var state by mutableStateOf(BooksState())
@@ -88,8 +91,10 @@ class MainViewModel @Inject constructor(
             }
     }
 
-    fun authWithMicrosoft() {
-        TODO("Not yet implemented")
+    fun authWithMicrosoft() = viewModelScope.launch {
+        auth.auth().collect {
+            Timber.d("MRMR Hello")
+        }
     }
 
 }

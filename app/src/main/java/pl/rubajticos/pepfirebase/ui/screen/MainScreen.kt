@@ -1,5 +1,6 @@
 package pl.rubajticos.pepfirebase.ui.screen
 
+import android.app.Activity
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,22 +14,35 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.OAuthProvider
 import pl.rubajticos.pepfirebase.model.Book
+import timber.log.Timber
 
 @Composable
 fun MainScreen(navController: NavController, viewModel: MainViewModel = hiltViewModel()) {
     val state = viewModel.state
+    val activity = LocalContext.current as Activity
     Column(modifier = Modifier
         .fillMaxHeight()
         .fillMaxWidth()) {
         Button(onClick = {
-            viewModel.authWithMicrosoft()
+            val provider = OAuthProvider.newBuilder("microsoft.com")
+            val firebaseAuth = FirebaseAuth.getInstance()
+            firebaseAuth.startActivityForSignInWithProvider(activity, provider.build())
+                .addOnSuccessListener {
+                    Timber.d("MRMR ${it.user?.email}")
+                }
+                .addOnFailureListener {
+                    Timber.d("MRMR Error ${it.localizedMessage}")
+                }
         }) {
             Text(text = "Sign In with Microsoft")
         }
