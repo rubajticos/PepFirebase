@@ -30,12 +30,12 @@ import timber.log.Timber
 fun MainScreen(navController: NavController, viewModel: MainViewModel = hiltViewModel()) {
     val state = viewModel.state
     val activity = LocalContext.current as Activity
+    val firebaseAuth = FirebaseAuth.getInstance()
     Column(modifier = Modifier
         .fillMaxHeight()
-        .fillMaxWidth()) {
+        .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Button(onClick = {
             val provider = OAuthProvider.newBuilder("microsoft.com")
-            val firebaseAuth = FirebaseAuth.getInstance()
             firebaseAuth.startActivityForSignInWithProvider(activity, provider.build())
                 .addOnSuccessListener {
                     Timber.d("MRMR ${it.user?.email}")
@@ -46,6 +46,16 @@ fun MainScreen(navController: NavController, viewModel: MainViewModel = hiltView
         }) {
             Text(text = "Sign In with Microsoft")
         }
+        Button(onClick = {
+            firebaseAuth.signOut()
+        }) {
+            Text(text = "Sign out")
+        }
+        val user = firebaseAuth.currentUser
+        Text(text = user?.displayName?: "Name")
+        Text(text = user?.email?: "E-mail")
+        Text(text = user?.phoneNumber?: "Phone")
+
         BooksList(state.books, navController)
     }
 
