@@ -11,18 +11,30 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.OAuthProvider
+import kotlinx.coroutines.channels.trySendBlocking
 import pl.rubajticos.pepfirebase.model.Book
 import timber.log.Timber
 
@@ -31,34 +43,88 @@ fun MainScreen(navController: NavController, viewModel: MainViewModel = hiltView
     val state = viewModel.state
     val activity = LocalContext.current as Activity
     val firebaseAuth = FirebaseAuth.getInstance()
-    Column(modifier = Modifier
-        .fillMaxHeight()
-        .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Button(onClick = {
-            val provider = OAuthProvider.newBuilder("microsoft.com")
-            firebaseAuth.startActivityForSignInWithProvider(activity, provider.build())
-                .addOnSuccessListener {
-                    Timber.d("MRMR ${it.user?.email}")
-                }
-                .addOnFailureListener {
-                    Timber.d("MRMR Error ${it.localizedMessage}")
-                }
-        }) {
-            Text(text = "Sign In with Microsoft")
-        }
-        Button(onClick = {
-            firebaseAuth.signOut()
-        }) {
-            Text(text = "Sign out")
-        }
-        val user = firebaseAuth.currentUser
-        Text(text = user?.displayName?: "Name")
-        Text(text = user?.email?: "E-mail")
-        Text(text = user?.phoneNumber?: "Phone")
-
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        UserPanel(activity, firebaseAuth, state, viewModel)
         BooksList(state.books, navController)
     }
+}
 
+@Composable
+fun UserPanel(
+    activity: Activity,
+    firebaseAuth: FirebaseAuth,
+    state: BooksState,
+    viewModel: MainViewModel,
+) {
+    if (state.beginLoginFlow) {
+        val provider = OAuthProvider.newBuilder("microsoft.com")
+        firebaseAuth.startActivityForSignInWithProvider(activity, provider.build())
+            .addOnSuccessListener {
+                viewModel.handleUserLogin(it.user)
+            }
+            .addOnFailureListener {
+                Timber.d("MRMR Error now = ${it.localizedMessage}")
+            }
+        viewModel.loginFlowBegin()
+    } else {
+        if (state.user == null) {
+            LoginButton() {
+                viewModel.loginWithMicrosoft()
+            }
+        } else {
+            SignOutButton() {
+                viewModel.signOut()
+            }
+            UserDetails(state.user)
+        }
+    }
+}
+
+@Composable
+fun UserDetails(user: FirebaseUser?) {
+    Text(text = user?.displayName ?: "Name")
+    Text(text = user?.email ?: "E-mail")
+    Text(text = user?.phoneNumber ?: "Phone")
+}
+
+@Composable
+fun SignOutButton(onClick: () -> Unit) {
+    Button(onClick = {
+        onClick.invoke()
+    }) {
+        Text(text = "Sign out")
+    }
+}
+
+@Composable
+fun LoginButton(onClick: () -> Unit) {
+    Button(onClick = {
+        onClick.invoke()
+    }) {
+        Text(text = "Sign In with Microsoft")
+    }
+}
+
+@Composable
+fun OnLifecycleEvent(onEvent: (owner: LifecycleOwner, event: Lifecycle.Event) -> Unit) {
+    val eventHandler = rememberUpdatedState(onEvent)
+    val lifecycleOwner = rememberUpdatedState(LocalLifecycleOwner.current)
+
+    DisposableEffect(lifecycleOwner.value) {
+        val lifecycle = lifecycleOwner.value.lifecycle
+        val observer = LifecycleEventObserver { owner, event ->
+            eventHandler.value(owner, event)
+        }
+
+        lifecycle.addObserver(observer)
+        onDispose {
+            lifecycle.removeObserver(observer)
+        }
+    }
 }
 
 @Composable

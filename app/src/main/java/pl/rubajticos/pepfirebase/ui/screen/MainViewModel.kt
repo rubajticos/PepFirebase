@@ -5,6 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,15 +16,13 @@ import java.lang.Byte
 import javax.inject.Inject
 import kotlin.Any
 import kotlin.String
-import kotlin.TODO
 import kotlin.onFailure
 import kotlin.onSuccess
 import kotlin.runCatching
 import kotlin.to
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import pl.rubajticos.pepfirebase.auth.MicrosoftAuthentication
+import kotlinx.coroutines.withContext
 import pl.rubajticos.pepfirebase.data.PeopleRepository
 import pl.rubajticos.pepfirebase.data.RealtimeBookRepository
 import timber.log.Timber
@@ -30,12 +32,12 @@ class MainViewModel @Inject constructor(
     private val peopleRepository: PeopleRepository,
     private val booksRepository: RealtimeBookRepository,
     private val database: FirebaseDatabase,
-    private val auth: MicrosoftAuthentication
 ) : ViewModel() {
 
     var state by mutableStateOf(BooksState())
 
     init {
+        checkLoggedUser()
         viewModelScope.launch {
             peopleRepository.allPeople()
                 .collect {
@@ -91,10 +93,41 @@ class MainViewModel @Inject constructor(
             }
     }
 
-    fun authWithMicrosoft() = viewModelScope.launch {
-        auth.auth().collect {
-            Timber.d("MRMR Hello")
+    private fun checkLoggedUser() = viewModelScope.launch {
+        val firebaseAuth = FirebaseAuth.getInstance()
+        handleUserLogin(firebaseAuth.currentUser)
+    }
+
+    fun loginWithMicrosoft() = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+            val pendingResult = FirebaseAuth.getInstance().pendingAuthResult
+            if (pendingResult != null) {
+                Timber.d("MRMR There is some pending result!")
+                pendingResult.addOnSuccessListener {
+                    handleUserLogin(it.user)
+                }.addOnFailureListener {
+                    Timber.e("MRMR Login error: ${it.localizedMessage}")
+                }
+            } else {
+                Timber.d("MRMR No pending result. Begin login flow.")
+                state = state.copy(beginLoginFlow = true)
+            }
         }
+    }
+
+    fun loginFlowBegin() {
+        state = state.copy(beginLoginFlow = false)
+    }
+
+    fun handleUserLogin(currentUser: FirebaseUser?) = viewModelScope.launch {
+        Timber.d("MRMR Current user: ${currentUser?.email}")
+        state = state.copy(user = currentUser)
+    }
+
+    fun signOut() = viewModelScope.launch {
+        Timber.d("MRMR Signing out...")
+        FirebaseAuth.getInstance().signOut()
+        handleUserLogin(null)
     }
 
 }
